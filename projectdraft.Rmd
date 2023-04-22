@@ -61,6 +61,17 @@ ncaa_full = read_csv('../../data/ncaa/ncaa_tournament_full.csv')
 
     -   This section should not include substantial interpretation of results. Leave that for the discussion.
 
+```{r}
+ncaa_seed_sum = ncaa_full %>%
+  group_by(seed_season) %>%
+  summarize(avg_adj_oe = round(mean(AdjOE), 2),
+            avg_adj_de = round(mean(AdjDE), 2),
+            avg_adj_em = round(mean(AdjEM), 2))
+
+ggplot(ncaa_seed_sum, aes()) +
+  geom_col()
+```
+
 ## Discussion
 
 -   Discussion
