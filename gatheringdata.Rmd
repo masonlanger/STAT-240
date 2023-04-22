@@ -1,0 +1,91 @@
+---
+title: "Compiling NCAA Data"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup}
+library(tidyverse)
+```
+
+## Retrieving Data for NCAA D1 Men's Basketball Tournament Teams
+
+### 2012-23
+
+> All NCAA data is from *kenpom.com*
+
+```{r retrieve all data from 2012-2023}
+ncaa23 = read_csv('../../data/ncaa/summary23_pt.csv') %>%
+  rename(AdjSOS = AdjEM) %>%
+  drop_na(seed) %>%
+  mutate(seed = as.character(seed))
+ncaa22 = read_csv('../../data/ncaa/summary22_pt.csv') %>%
+  rename(AdjSOS = AdjEM) %>%
+  drop_na(seed) %>%
+  mutate(seed = as.character(seed))
+ncaa21 = read_csv('../../data/ncaa/summary21_pt.csv') %>%
+  rename(AdjSOS = AdjEM) %>%
+  drop_na(seed) %>%
+  mutate(seed = as.character(seed))
+ncaa19 = read_csv('../../data/ncaa/summary19_pt.csv') %>%
+  rename(AdjSOS = AdjEM) %>%
+  drop_na(seed) %>%
+  mutate(seed = as.character(seed))
+ncaa18 = read_csv('../../data/ncaa/summary18_pt.csv') %>%
+  rename(AdjSOS = AdjEM) %>%
+  drop_na(seed) %>%
+  mutate(seed = as.character(seed))
+ncaa17 = read_csv('../../data/ncaa/summary17_pt.csv') %>%
+  rename(AdjSOS = AdjEM) %>%
+  drop_na(seed) %>%
+  mutate(seed = as.character(seed))
+ncaa16 = read_csv('../../data/ncaa/summary16_pt.csv') %>%
+  rename(AdjSOS = AdjEM) %>%
+  drop_na(seed) %>%
+  mutate(seed = as.character(seed))
+ncaa15 = read_csv('../../data/ncaa/summary15_pt.csv') %>%
+  rename(AdjSOS = AdjEM) %>%
+  drop_na(seed) %>%
+  mutate(seed = as.character(seed))
+ncaa14 = read_csv('../../data/ncaa/summary14_pt.csv') %>%
+  rename(AdjSOS = AdjEM) %>%
+  drop_na(seed) %>%
+  mutate(seed = as.character(seed))
+ncaa13 = read_csv('../../data/ncaa/summary13_pt.csv') %>%
+  rename(AdjSOS = AdjEM) %>%
+  drop_na(seed) %>%
+  mutate(seed = as.character(seed))
+ncaa12 = read_csv('../../data/ncaa/summary12_pt.csv') %>%
+  rename(AdjSOS = AdjEM) %>%
+  drop_na(seed) %>%
+  mutate(seed = as.character(seed))
+
+```
+
+### Compiling into Single Data Frame for Future Data Exploration
+
+```{r compile into one data frame}
+ncaa_full = ncaa23 %>%
+  bind_rows(ncaa22) %>%
+  bind_rows(ncaa21) %>%
+  bind_rows(ncaa19) %>%
+  bind_rows(ncaa18) %>%
+  bind_rows(ncaa17) %>%
+  bind_rows(ncaa16) %>%
+  bind_rows(ncaa15) %>%
+  bind_rows(ncaa14) %>%
+  bind_rows(ncaa13) %>%
+  bind_rows(ncaa12) %>%
+  filter(seed != 'NULL') %>%
+  rename(RankTempoSeason = RankTempo,
+         RankAdjTempoSeason = RankAdjTempo,
+         RankOESeason = RankOE,
+         RankAdjOESeason = RankAdjOE,
+         RankDESeason = RankDE,
+         RankAdjDESeason = RankAdjDE,
+         RankAdjSOS_Season = RankAdjEM,
+         seed_season = seed)
+
+df = write.csv(ncaa_full, '../../data/ncaa/ncaa_tournament_full.csv')
+```
