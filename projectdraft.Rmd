@@ -59,6 +59,17 @@ ncaa_full = read_csv('../../data/ncaa/ncaa_tournament_full.csv')
 
     -   This section should not include substantial interpretation of results. Leave that for the discussion.
 
+### Offensive Efficiency vs. Defensive Efficiency
+
+```{r}
+ggplot(ncaa_full, aes(x = AdjDE, y = AdjOE, color = seed_season)) +
+  geom_point() +
+  geom_hline(yintercept = mean(ncaa_full$AdjOE)) +
+  geom_vline(xintercept = mean(ncaa_full$AdjDE))
+```
+
+### Average Adjusted Efficiency Margin by Seed
+
 ```{r}
 ncaa_seed_sum = ncaa_full %>%
   group_by(seed_season) %>%
@@ -71,6 +82,36 @@ ggplot(ncaa_seed_sum, aes(x = factor(seed_season), y = avg_adj_em)) +
   xlab("Seed") +
   ylab("Adjusted Efficiency Margin")
 ```
+
+### Top Four Teams (since 2012) in Adjusted Offensive and Adjusted Defensive Efficiency
+
+#### Offensive Efficiency
+
+```{r}
+top4_aoe = ncaa_full %>%
+  mutate(AdjOE = round(AdjOE, 2)) %>%
+  slice_max(order_by = AdjOE, n = 4) %>%
+  select(Season, TeamName, AdjOE, seed_season)
+
+top4_aoe %>%
+  print.data.frame(digits = 5)
+```
+
+> The top four highest adjusted offensive efficiencies since 2012 include **2018 Villanova**, **2015 Wisconsin**, **2021** **Gonzaga**, and **2014 Creighton**. The sample features three one seeds, all of which made the National Championship game.
+
+#### Defensive Efficiency
+
+```{r}
+top4_ade = ncaa_full %>%
+  mutate(AdjDE = round(AdjDE, 2)) %>%
+  slice_min(order_by = AdjDE, n = 4) %>%
+  select(Season, TeamName, AdjOE, seed_season)
+
+top4_ade %>%
+  print.data.frame(digits = 5)
+```
+
+> The top four highest adjusted defensive efficiencies since 2012 include **2013 Louisville**, **2015 Kentucky**, **2018** and **2015** **Virginia**. The sample features three one seeds, two of which made it the Final Four--Louisville being the 2013 National Champion.
 
 ## Discussion
 
