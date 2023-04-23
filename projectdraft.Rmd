@@ -7,6 +7,7 @@ date: "2023-04-22"
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
+source("../../scripts/viridis.R")
 
 ncaa_full = read_csv('../../data/ncaa/ncaa_tournament_full.csv')
 ```
@@ -62,10 +63,13 @@ ncaa_full = read_csv('../../data/ncaa/ncaa_tournament_full.csv')
 ### Offensive Efficiency vs. Defensive Efficiency
 
 ```{r}
-ggplot(ncaa_full, aes(x = AdjDE, y = AdjOE, color = seed_season)) +
+ggplot(ncaa_full, aes(x = AdjDE, y = AdjOE, color = seed_season), size = 3) +
   geom_point() +
   geom_hline(yintercept = mean(ncaa_full$AdjOE)) +
-  geom_vline(xintercept = mean(ncaa_full$AdjDE))
+  geom_vline(xintercept = mean(ncaa_full$AdjDE)) +
+  xlab("Adjusted Defensive Efficiency") +
+  ylab("Adjusted Offensive Efficiency") +
+  ggtitle("Adjusted Offensive Efficiency vs. Adjusted Defensive Efficiency", subtitle="Each NCAA Tournament Team, 2012-23")
 ```
 
 ### Average Adjusted Efficiency Margin by Seed
@@ -77,10 +81,15 @@ ncaa_seed_sum = ncaa_full %>%
             avg_adj_de = round(mean(AdjDE), 2),
             avg_adj_em = round(mean(AdjEM), 2))
 
+ncaa_seed_sum %>%
+  print(n = Inf)
+
 ggplot(ncaa_seed_sum, aes(x = factor(seed_season), y = avg_adj_em)) +
-  geom_col() +
+  geom_col(fill = 'slateblue4') +
   xlab("Seed") +
-  ylab("Adjusted Efficiency Margin")
+  ylab("Adjusted Efficiency Margin") +
+  ggtitle("Average Adjusted Efficiency Margin by Seed",
+          subtitle="2012-2023 ")
 ```
 
 ### Top Four Teams (since 2012) in Adjusted Offensive and Adjusted Defensive Efficiency
