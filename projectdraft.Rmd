@@ -14,53 +14,44 @@ ncaa_full = read_csv('../../data/ncaa/ncaa_tournament_full.csv')
 
 ## Project Draft
 
+### Group Members
+
+-   Sid Ganesh
+-   Mason Langer
+-   Lauren Graham
+-   Richard Wolff
+
 ## Introduction
 
--   Introduction
-
-    -   The opening sentence or sentences should draw the reader into your report by providing high-level motivation for the analysis. 
-
-    -   Describe the question or questions of interest and the motivation for the analysis.
-
-    -   Conclude the introduction with a **thesis statement**.
-
-        **Thesis**: Higher-seed teams (1-8) make the Final Four more frequently than lower-seeded (9-16) teams, due to a combination of proficient offensive and defensive ratings.
+Basketball is an incredibly variable sport. While all sports share a degree of randomness, basketball--specifically college basketball's "March Madness," the single-elimination Division 1 NCAA (National Collegiate Athletics Association) National Tournament--can be truly unpredictable. Displayed by its wild upsets, incredible buzzer beaters, and "Cinderella stories," March Madness provides a unique glimpse into basketball odds and probabilities. As a group, we chose the NCAA D1 Men's National Tournament as both our topic and our sample, as we wanted to see the statistical trends in common with the most successful of the tournament teams over the past decade. Specifically, we wanted to see how a team's statistical ratings before the tournament would affect their success in the tournament field. **As such, we believe that higher-seed teams (1-8) make the Final Four more frequently than lower-seeded (9-16) teams, due to their highly proficient statistical profile, which includes offensive and defensive ratings.**
 
 ## Background
 
--   Background
+The majority of our data used throughout the report was gathered from [**kenpom.com**](https://www.kenpom.com), a renowned basketball analytics website that tracks statistics for all 358 teams in NCAA Division 1 Men's Basketball. Using data summaries for every year between 2012 and 2023 (excluding 2020), we were able to compile a data set with the following variables:
 
-    -   Describe the data set, how it was collected, what the variables mean.
+-   *Season*: year of the tournament
 
-    -   Cite the source of your data.
+-   *Offensive Efficiency (OE)*: points scored per game
 
-    -   Describe any background information needed to better comprehend the question or questions you are posing and how the data relate to the question.
+    -   *Adjusted Off. Efficiency (AdjOE)*: points scored per 100 possessions
 
-    -   Describe any unusual factors which may affect interpretation of results.
+    -   A higher offensive efficiency means that the team has a good offensive
 
-    -   Describe what you intend to do in the rest of the report.
+-   *Defensive Efficiency (DE)*: points allowed per game
+
+    -   *Adjusted Def. Efficiency (AdjDE)*: points allowed per 100 possessions
+
+    -   A lower defensive efficiency means that the team has a good defense
+
+-   *Efficiency Margin (EM)*: difference of offensive efficiency and defensive efficiency ($OE - DE$)
+
+    -   *Adjusted Eff. Margin (AdjEM)*: difference of adjusted off. efficiency and adjusted def. efficiency
+
+-   *Seed*: seed of the team in the tournament occurring in that respective season
+
+Each data value is that team's value **before** the national tournament. Our data analysis will prioritize *AdjOE*, *AdjDE*, and *AdjEM*, as they represent a standardized metric that can be used to effectively compare teams. However, as there are many different qualitative and quantitative factors that can affect a single basketball game, it is not possible to get the full picture of a basketball team using three statistics. Although it may not showcase the full picture, our three primary metrics can be used to provide a strong explanation for a team's prolonged success. Moving forward, we will use *AdjOE*, *AdjDE*, and *AdjEM* to distinguish between successful and unsuccessful basketball programs, and the typical profile of a championship-contending team.
 
 ## Analysis
-
--   Analysis
-
-    -   Include numerical and graphical summaries of the data. Be sure to introduce and describe your numerical and graphical summaries.  Do not display a series of summaries without text explaining them.
-
-        -   Including:
-
-            -   Bar graph of [average adjusted offensive rating and defensive rating (AdjOE & AdjDE)]{.underline} by **seed**
-
-            -   Bar graph of [average adjusted strength of schedule (AdjSOS)]{.underline} by **seed**
-
-    -   Make sure to include at least one graphical display of the data that best supports your main conclusions for your primary question, and explain how it supports your conclusions.
-
-    -   For each inference you make, briefly describe the method you use and what the results are.
-
-    -   Provide evidence to support each of your claims.
-
-    -   This section should not include substantial interpretation of results. Leave that for the discussion.
-
-### Offensive Efficiency vs. Defensive Efficiency
 
 ```{r}
 ggplot(ncaa_full, aes(x = AdjDE, y = AdjOE, color = seed_season), size = 3) +
@@ -71,6 +62,12 @@ ggplot(ncaa_full, aes(x = AdjDE, y = AdjOE, color = seed_season), size = 3) +
   ylab("Adjusted Offensive Efficiency") +
   ggtitle("Adjusted Offensive Efficiency vs. Adjusted Defensive Efficiency", subtitle="Each NCAA Tournament Team, 2012-23")
 ```
+
+-   Horizontal and vertical black lines demonstrate the mean adjusted offensive efficiency and mean adjusted defensive efficiency, respectively
+
+-   Teams in the top left quadrant demonstrate a great offenses and defense, while the teams in the bottom right quadrant demonstrate bad offenses and defenses
+
+    -   Roughly aligns with seeding (higher seeds in top left, lower seeds in top right)
 
 ### Average Adjusted Efficiency Margin by Seed
 
@@ -91,6 +88,10 @@ ggplot(ncaa_seed_sum, aes(x = factor(seed_season), y = avg_adj_em)) +
   ggtitle("Average Adjusted Efficiency Margin by Seed",
           subtitle="2012-2023 ")
 ```
+
+> Higher seeds, specifically 1-4 seeds, have great efficiency margins ($>20$+), while low seeds (13-16) have significantly low efficiency margins, with the average 16 seed having a negative efficiency margin.
+
+-   Negative efficiency margins mean that the team has, on average, been outscored by their opponents ($AdjDE > AdjOE$)
 
 ### Top Four Teams (since 2012) in Adjusted Offensive and Adjusted Defensive Efficiency
 
