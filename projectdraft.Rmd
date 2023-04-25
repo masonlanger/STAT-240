@@ -28,25 +28,25 @@ Basketball is an incredibly variable sport. While all sports share a degree of r
 
 The majority of our data used throughout the report was gathered from [**kenpom.com**](https://www.kenpom.com), a renowned basketball analytics website that tracks statistics for all 358 teams in NCAA Division 1 Men's Basketball. Using data summaries for every year between 2012 and 2023 (excluding 2020), we were able to compile a data set with the following variables:
 
--   *Season*: year of the tournament
+-   *Season*: ^[year of the tournament]
 
--   *Offensive Efficiency (OE)*: points scored per game
+-   *Offensive Efficiency (OE)*: ^[points scored per game]
 
-    -   *Adjusted Off. Efficiency (AdjOE)*: points scored per 100 possessions
+    -   *Adjusted Off. Efficiency (AdjOE)*: ^[points scored per 100 possessions]
 
     -   A higher offensive efficiency means that the team has a good offensive
 
--   *Defensive Efficiency (DE)*: points allowed per game
+-   *Defensive Efficiency (DE)*: ^[points allowed per game]
 
-    -   *Adjusted Def. Efficiency (AdjDE)*: points allowed per 100 possessions
+    -   *Adjusted Def. Efficiency (AdjDE)*: ^[points allowed per 100 possessions]
 
     -   A lower defensive efficiency means that the team has a good defense
 
--   *Efficiency Margin (EM)*: difference of offensive efficiency and defensive efficiency ($OE - DE$)
+-   *Efficiency Margin (EM)*: ^[difference of offensive efficiency and defensive efficiency] ($OE - DE$)
 
-    -   *Adjusted Eff. Margin (AdjEM)*: difference of adjusted off. efficiency and adjusted def. efficiency
+    -   *Adjusted Eff. Margin (AdjEM)*: ^[difference of adjusted off. efficiency and adjusted def. efficiency]
 
--   *Seed*: seed of the team in the tournament occurring in that respective season
+-   *Seed*: ^[seed of the team in the tournament occurring in that respective season]
 
 Each data value is that team's value **before** the national tournament. Our data analysis will prioritize *AdjOE*, *AdjDE*, and *AdjEM*, as they represent a standardized metric that can be used to effectively compare teams. However, as there are many different qualitative and quantitative factors that can affect a single basketball game, it is not possible to get the full picture of a basketball team using three statistics. Although it may not showcase the full picture, our three primary metrics can be used to provide a strong explanation for a team's prolonged success. Moving forward, we will use *AdjOE*, *AdjDE*, and *AdjEM* to distinguish between successful and unsuccessful basketball programs, and the typical profile of a championship-contending team.
 
@@ -127,8 +127,3 @@ top4_ade %>%
 > To conclude, higher seeded teams (1-8) tend to make the Final Four more frequently than lower seeded teams in the NCAA March Madness tournament. This is supported by our analysis of efficiency margins, offensive and defensive efficiency, and seeding. Based on our findings, higher seeded teams do perform better in the tournament.
 
 ### References
-
--   References
-
-In the R Markdown file, you may automatically cite other resources by using a caret followed by the reference between square brackets: \^[your reference text] which will place a marker at this location and a footnote at the end of the document.
-Footer
