@@ -8,7 +8,6 @@ date: "2023-04-22"
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 source("../../scripts/viridis.R")
-
 ncaa_full = read_csv('../../data/ncaa/ncaa_tournament_full.csv')
 ```
 
@@ -77,10 +76,8 @@ ncaa_seed_sum = ncaa_full %>%
   summarize(avg_adj_oe = round(mean(AdjOE), 2),
             avg_adj_de = round(mean(AdjDE), 2),
             avg_adj_em = round(mean(AdjEM), 2))
-
 ncaa_seed_sum %>%
   print(n = Inf)
-
 ggplot(ncaa_seed_sum, aes(x = factor(seed_season), y = avg_adj_em)) +
   geom_col(fill = 'slateblue4') +
   xlab("Seed") +
@@ -89,9 +86,7 @@ ggplot(ncaa_seed_sum, aes(x = factor(seed_season), y = avg_adj_em)) +
           subtitle="2012-2023 ")
 ```
 
-> Higher seeds, specifically 1-4 seeds, have great efficiency margins ($>20$+), while low seeds (13-16) have significantly low efficiency margins, with the average 16 seed having a negative efficiency margin.
-
--   Negative efficiency margins mean that the team has, on average, been outscored by their opponents ($AdjDE > AdjOE$)
+> Higher seeds, specifically 1-4 seeds, have great efficiency margins ($>20$+), while low seeds (13-16) have significantly low efficiency margins, with the average 16 seed having a negative efficiency margin. Negative efficiency margins mean that the team has, on average, been outscored by their opponents ($AdjDE > AdjOE$)
 
 ### Top Four Teams (since 2012) in Adjusted Offensive and Adjusted Defensive Efficiency
 
@@ -102,7 +97,6 @@ top4_aoe = ncaa_full %>%
   mutate(AdjOE = round(AdjOE, 2)) %>%
   slice_max(order_by = AdjOE, n = 4) %>%
   select(Season, TeamName, AdjOE, seed_season)
-
 top4_aoe %>%
   print.data.frame(digits = 5)
 ```
@@ -116,7 +110,6 @@ top4_ade = ncaa_full %>%
   mutate(AdjDE = round(AdjDE, 2)) %>%
   slice_min(order_by = AdjDE, n = 4) %>%
   select(Season, TeamName, AdjOE, seed_season)
-
 top4_ade %>%
   print.data.frame(digits = 5)
 ```
@@ -125,24 +118,17 @@ top4_ade %>%
 
 ## Discussion
 
--   Discussion
+> To restate our thesis, we believe that higher-seeded teams (1-8) make the Final Four more frequently than lower-seeded (9-16) teams, due to their highly proficient statistical profile, including mainly but not limited to offensive and defensive ratings. As can be seen in our brief data analysis above, out of the all the teams from the past 10 years (not including 2020 due to the pandemic), average efficiency margin is highest with higher seeds and lowest (even negative) with lower seeds. Furthermore, just doing a brief survey of the top 4 teams in regards to their defensive and offensive ratings in the whole data set, they all appear to be be 3 seed or lower, and almost always make it into the Final Four and the Championship game. Finally, teams with a combination of a low defensive efficiency (which is considered good) and a high offensive efficiency are concentrated with seedings of 1-8. All of our graphs provide strong evidence in proving our thesis that higher seeded teams go farther and do better in the NCAA March Madness Tournament.
 
-    -   Provide broader interpretations of your analysis and describe how to interpret your results with respect to your question of interest.
+> Of course, we must consider the short-comings of our data analysis. There are many lower seeded teams who make it far in the tournament and have offensive and defensive efficiency ratings that are not dissimilar to the majority of the higher seeded teams. These "Cinderella" story teams surface every year and are generally unpredictable in how far they will go in the tournament. Furthermore, these teams can create many upsets in the tournament. A prime example is 16 seed Fairleigh Dickinson beating 1 seed Purdue in this year's tournament.Naturally, we must acknowledge that our thesis that higher seeded teams make it farther in the tournament can be violated by these occassional lower seeded teams that make it far in the tournament, but the majority of time, our thesis still stands.
 
-    -   Discuss any potential short-comings of the analysis.
+> In the future, we can consider many other extraneous variables as well. For example, continuing with the example of Fairleigh Dickinson v. Purdue, many argue that Purdue had a very easy schedule coming into the tournament, and that they were a "fraud" one seed, which is why a 16 seed was able to beat them. This in no way diminishes FDU and other lower seeded teams, but this could help us analyze factors leading to other one seed and higher seed teams not making it to the Final Four. Furthermore, we can critique higher seeded teams making it to the Final Four by evaluating the strength of their schedule leading into the Final Four, and if they had an "easy path" or "hard path" to the Final Four. In order to do this, we would have to consider new data about the pre-tournament schedules of these teams' path to the Final Four and whether or not they deserved their seeding. Additional analysis could also include the correlation between the strength of a conference of a team and their performance in the tournament. Furthermore, we can include the data from every tournament that has ever occurred and peform analyses per decade to see the variation of seedings affecting performance. Finally, it is important to recognize the the March Madness Tournament is essentially random in the end, and anything can happen, ranging from many factors such as injuries to off-court troubles.
 
-    -   Discuss potential future directions for additional work
-
-        -   New questions
-
-        -   Different methods to address the same questions
-
-        -   New data you might collect to refine your understanding
-
-    -   Summarize your primary conclusions and the primary evidence that supports these conclusions.
+> To conclude, higher seeded teams (1-8) tend to make the Final Four more frequently than lower seeded teams in the NCAA March Madness tournament. This is supported by our analysis of efficiency margins, offensive and defensive efficiency, and seeding. Based on our findings, higher seeded teams do perform better in the tournament.
 
 ### References
 
 -   References
 
 In the R Markdown file, you may automatically cite other resources by using a caret followed by the reference between square brackets: \^[your reference text] which will place a marker at this location and a footnote at the end of the document.
+Footer
