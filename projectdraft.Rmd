@@ -8,7 +8,10 @@ date: "2023-04-22"
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 source("../../scripts/viridis.R")
+
 ncaa_full = read_csv('../../data/ncaa/ncaa_tournament_full.csv')
+high = read_csv('../../data/ncaa/high_seeds.csv')
+low = read_csv('../../data/ncaa/low_seeds.csv')
 ```
 
 ## Project Draft
@@ -28,29 +31,31 @@ Basketball is an incredibly variable sport. While all sports share a degree of r
 
 The majority of our data used throughout the report was gathered from [**kenpom.com**](https://www.kenpom.com), a renowned basketball analytics website that tracks statistics for all 358 teams in NCAA Division 1 Men's Basketball. Using data summaries for every year between 2012 and 2023 (excluding 2020), we were able to compile a data set with the following variables:
 
--   *Season*: ^[year of the tournament]
+-   *Season*: year of the tournament
 
--   *Offensive Efficiency (OE)*: ^[points scored per game]
+-   *Offensive Efficiency (OE)*: points scored per game
 
-    -   *Adjusted Off. Efficiency (AdjOE)*: ^[points scored per 100 possessions]
+    -   *Adjusted Off. Efficiency (AdjOE)*: points scored per 100 possessions
 
     -   A higher offensive efficiency means that the team has a good offensive
 
--   *Defensive Efficiency (DE)*: ^[points allowed per game]
+-   *Defensive Efficiency (DE)*: points allowed per game
 
-    -   *Adjusted Def. Efficiency (AdjDE)*: ^[points allowed per 100 possessions]
+    -   *Adjusted Def. Efficiency (AdjDE)*: points allowed per 100 possessions
 
     -   A lower defensive efficiency means that the team has a good defense
 
--   *Efficiency Margin (EM)*: ^[difference of offensive efficiency and defensive efficiency] ($OE - DE$)
+-   *Efficiency Margin (EM)*: difference of offensive efficiency and defensive efficiency ($OE - DE$)
 
-    -   *Adjusted Eff. Margin (AdjEM)*: ^[difference of adjusted off. efficiency and adjusted def. efficiency]
+    -   *Adjusted Eff. Margin (AdjEM)*: difference of adjusted off. efficiency and adjusted def. efficiency
 
--   *Seed*: ^[seed of the team in the tournament occurring in that respective season]
+-   *Seed*: seed of the team in the tournament occurring in that respective season
 
 Each data value is that team's value **before** the national tournament. Our data analysis will prioritize *AdjOE*, *AdjDE*, and *AdjEM*, as they represent a standardized metric that can be used to effectively compare teams. However, as there are many different qualitative and quantitative factors that can affect a single basketball game, it is not possible to get the full picture of a basketball team using three statistics. Although it may not showcase the full picture, our three primary metrics can be used to provide a strong explanation for a team's prolonged success. Moving forward, we will use *AdjOE*, *AdjDE*, and *AdjEM* to distinguish between successful and unsuccessful basketball programs, and the typical profile of a championship-contending team.
 
 ## Analysis
+
+#### Adjusted Offensive and Defensive Ratings
 
 ```{r}
 ggplot(ncaa_full, aes(x = AdjDE, y = AdjOE, color = seed_season), size = 3) +
@@ -68,7 +73,101 @@ ggplot(ncaa_full, aes(x = AdjDE, y = AdjOE, color = seed_season), size = 3) +
 
     -   Roughly aligns with seeding (higher seeds in top left, lower seeds in top right)
 
-### Average Adjusted Efficiency Margin by Seed
+### Confidence Intervals for High-Seeded and Low-Seeded Teams
+
+#### Comparing Adjusted Offensive and Defensive Efficiencies By Seed
+
+#### Visualizing Differences in Distribution by Seeding Group
+
+```{r}
+ggplot(ncaa_full, aes(x = AdjOE)) +
+  geom_density() +
+  facet_wrap(vars(seeding)) +
+  xlab("Adjusted Offensive Efficiency") +
+  ylab("Density") +
+  ggtitle("Density of Adjusted Offensive Ratings by Seeding")
+```
+
+-   The graph demonstrates that the distribution of adjusted offensive ratings for high seeds is skewed to the left, meaning seeds in this range typically have a greater adjusted offensive rating, implying that these teams have great offenses.
+
+    -   The opposite is shown for low seeds, which are skewed to the right, meaning their adjust offensive ratings are typically low than those of their competition
+
+```{r}
+ggplot(ncaa_full, aes(x = AdjDE)) +
+  geom_density() +
+  facet_wrap(vars(seeding)) +
+  xlab("Adjusted Defensive Efficiency") +
+  ylab("Density") +
+  ggtitle("Density of Adjusted Defensive Ratings by Seeding")
+```
+
+-   These three graphs are roughly the opposite of what was seen in the adjusted offensive efficiency distribution, which is not surprising. Instead, the right-skew of the distribution for high seeds suggests that these teams typically have great defenses, hence their low adjusted defensive efficiency.
+
+    -   Again, the opposite is shown for low seeds, which is less polarized than what was seen with offensive efficiency, but still shows a clear pattern of lower-seeded teams having worse defenses than their competition.
+
+#### Calculating Confidence Intervals for Means of Adjusted Efficiency Ratings
+
+-   Adjusted offensive and defensive efficiency for high-seeded teams
+
+```{r}
+hi_adj_oe = high %>%
+  pull(AdjOE)
+
+hi_adj_de = high %>%
+  pull(AdjDE)
+
+xbar_hi_oe = mean(hi_adj_oe)
+sigma_hi_oe = sd(hi_adj_oe)
+se_hi_oe = sigma_hi_oe / sqrt(length(hi_adj_oe))
+
+ci_hi_oe = xbar_hi_oe + c(-1, 1)*1.96*se_hi_oe
+ci_hi_oe
+
+
+xbar_hi_de = mean(hi_adj_de)
+sigma_hi_de = sd(hi_adj_de)
+se_hi_de = sigma_hi_de / sqrt(length(hi_adj_de))
+
+ci_hi_de = xbar_hi_de + c(-1, 1)*1.96*se_hi_de
+ci_hi_de
+
+```
+
+> We are 95% confident that the true mean for a high-seeded team's adjusted offensive efficiency is between 116.73 and 118.02, while the true mean for their adjusted defensive efficiency is between 91.99 and 93.19.
+
+-   ...for lower-seeded teams
+
+```{r}
+low_adj_oe = low %>%
+  pull(AdjOE)
+
+low_adj_de = low %>%
+  pull(AdjDE)
+
+
+xbar_low_oe = mean(low_adj_oe)
+sigma_low_oe = sd(low_adj_oe)
+se_low_oe = sigma_low_oe / sqrt(length(low_adj_oe))
+
+ci_low_oe = xbar_low_oe + c(-1, 1)*1.96*se_low_oe
+ci_low_oe
+
+xbar_low_de = mean(low_adj_de)
+sigma_low_de = sd(low_adj_de)
+se_low_de = sigma_low_de / sqrt(length(low_adj_de))
+
+ci_low_de = xbar_low_de + c(-1, 1)*1.96*se_low_de
+ci_low_de
+
+```
+
+> We are 95% confident that the true mean for a low-seeded team's adjusted offensive efficiency is between 105.28 and 106.55, while the true mean for their adjusted defensive efficiency is between 102.12 and 103.32.
+
+### Regression with Adjusted Efficiency Margin and Seeds
+
+-   Regression with x = AdjEM and y = seed?
+
+#### Visualizing Average Adjusted EM by Seed to Verify Regression Findings
 
 ```{r}
 ncaa_seed_sum = ncaa_full %>%
@@ -76,8 +175,10 @@ ncaa_seed_sum = ncaa_full %>%
   summarize(avg_adj_oe = round(mean(AdjOE), 2),
             avg_adj_de = round(mean(AdjDE), 2),
             avg_adj_em = round(mean(AdjEM), 2))
+
 ncaa_seed_sum %>%
   print(n = Inf)
+
 ggplot(ncaa_seed_sum, aes(x = factor(seed_season), y = avg_adj_em)) +
   geom_col(fill = 'slateblue4') +
   xlab("Seed") +
@@ -86,7 +187,9 @@ ggplot(ncaa_seed_sum, aes(x = factor(seed_season), y = avg_adj_em)) +
           subtitle="2012-2023 ")
 ```
 
-> Higher seeds, specifically 1-4 seeds, have great efficiency margins ($>20$+), while low seeds (13-16) have significantly low efficiency margins, with the average 16 seed having a negative efficiency margin. Negative efficiency margins mean that the team has, on average, been outscored by their opponents ($AdjDE > AdjOE$)
+> Higher seeds, specifically 1-4 seeds, have great efficiency margins ($>20$+), while low seeds (13-16) have significantly low efficiency margins, with the average 16 seed having a negative efficiency margin.
+
+-   Negative efficiency margins mean that the team has, on average, been outscored by their opponents ($AdjDE > AdjOE$)
 
 ### Top Four Teams (since 2012) in Adjusted Offensive and Adjusted Defensive Efficiency
 
@@ -97,6 +200,7 @@ top4_aoe = ncaa_full %>%
   mutate(AdjOE = round(AdjOE, 2)) %>%
   slice_max(order_by = AdjOE, n = 4) %>%
   select(Season, TeamName, AdjOE, seed_season)
+
 top4_aoe %>%
   print.data.frame(digits = 5)
 ```
@@ -110,6 +214,7 @@ top4_ade = ncaa_full %>%
   mutate(AdjDE = round(AdjDE, 2)) %>%
   slice_min(order_by = AdjDE, n = 4) %>%
   select(Season, TeamName, AdjOE, seed_season)
+
 top4_ade %>%
   print.data.frame(digits = 5)
 ```
@@ -119,11 +224,11 @@ top4_ade %>%
 ## Discussion
 
 > To restate our thesis, we believe that higher-seeded teams (1-8) make the Final Four more frequently than lower-seeded (9-16) teams, due to their highly proficient statistical profile, including mainly but not limited to offensive and defensive ratings. As can be seen in our brief data analysis above, out of the all the teams from the past 10 years (not including 2020 due to the pandemic), average efficiency margin is highest with higher seeds and lowest (even negative) with lower seeds. Furthermore, just doing a brief survey of the top 4 teams in regards to their defensive and offensive ratings in the whole data set, they all appear to be be 3 seed or lower, and almost always make it into the Final Four and the Championship game. Finally, teams with a combination of a low defensive efficiency (which is considered good) and a high offensive efficiency are concentrated with seedings of 1-8. All of our graphs provide strong evidence in proving our thesis that higher seeded teams go farther and do better in the NCAA March Madness Tournament.
-
+>
 > Of course, we must consider the short-comings of our data analysis. There are many lower seeded teams who make it far in the tournament and have offensive and defensive efficiency ratings that are not dissimilar to the majority of the higher seeded teams. These "Cinderella" story teams surface every year and are generally unpredictable in how far they will go in the tournament. Furthermore, these teams can create many upsets in the tournament. A prime example is 16 seed Fairleigh Dickinson beating 1 seed Purdue in this year's tournament.Naturally, we must acknowledge that our thesis that higher seeded teams make it farther in the tournament can be violated by these occassional lower seeded teams that make it far in the tournament, but the majority of time, our thesis still stands.
-
+>
 > In the future, we can consider many other extraneous variables as well. For example, continuing with the example of Fairleigh Dickinson v. Purdue, many argue that Purdue had a very easy schedule coming into the tournament, and that they were a "fraud" one seed, which is why a 16 seed was able to beat them. This in no way diminishes FDU and other lower seeded teams, but this could help us analyze factors leading to other one seed and higher seed teams not making it to the Final Four. Furthermore, we can critique higher seeded teams making it to the Final Four by evaluating the strength of their schedule leading into the Final Four, and if they had an "easy path" or "hard path" to the Final Four. In order to do this, we would have to consider new data about the pre-tournament schedules of these teams' path to the Final Four and whether or not they deserved their seeding. Additional analysis could also include the correlation between the strength of a conference of a team and their performance in the tournament. Furthermore, we can include the data from every tournament that has ever occurred and peform analyses per decade to see the variation of seedings affecting performance. Finally, it is important to recognize the the March Madness Tournament is essentially random in the end, and anything can happen, ranging from many factors such as injuries to off-court troubles.
-
+>
 > To conclude, higher seeded teams (1-8) tend to make the Final Four more frequently than lower seeded teams in the NCAA March Madness tournament. This is supported by our analysis of efficiency margins, offensive and defensive efficiency, and seeding. Based on our findings, higher seeded teams do perform better in the tournament.
 
-### References
+## References 

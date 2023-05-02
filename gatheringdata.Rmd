@@ -74,7 +74,31 @@ ncaa_full = ncaa23 %>%
          RankDESeason = RankDE,
          RankAdjDESeason = RankAdjDE,
          RankAdjEM_Season = RankAdjEM,
-         seed_season = seed)
+         seed_season = seed) %>%
+  mutate(seed_season = as.integer(seed_season),
+         seeding = case_when(
+         as.integer(seed_season) >= 13 ~ 'low',
+         as.integer(seed_season) <= 4 ~ 'high',
+         TRUE ~ 'mid'
+  ))
 
 df = write.csv(ncaa_full, '../../data/ncaa/ncaa_tournament_full.csv')
+```
+
+## High Seed and Low Seed Data
+
+```{r}
+low = ncaa_full %>%
+  filter(seeding == 'low')
+low_oe = low %>% pull(AdjOE)
+low_de = low %>% pull(AdjDE)
+
+df = write.csv(low, '../../data/ncaa/low_seeds.csv')
+
+high = ncaa_full %>%
+  filter(seeding == 'high')
+high_oe = high %>% pull(AdjOE)
+high_de = high %>% pull(AdjDE)
+
+df = write.csv(high, '../../data/ncaa/high_seeds.csv')
 ```
