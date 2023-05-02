@@ -166,7 +166,7 @@ ci_low_de
 
 ### Regression with Adjusted Efficiency Margin and Seeds
 
--   Regression with x = AdjEM and y = seed?
+1.  Determining correlation coefficient
 
 ```{r}
 ncaa_adj_em = ncaa_full %>%
@@ -181,6 +181,11 @@ r
 
 -   $r=-0.8997$ suggests that the data points are tightly clustered around a negative slope
 
+2.  Regression Hypothesis Testing
+
+-   $H_0$ : $\beta_1=0$ (there is no association between Adjusted Efficiency Margin and Seeding)<br>
+-   $H_a$ : $\beta_1\neq0$ (there is a linear association between Adjusted Efficiency Margin and Seeding)
+
 ```{r}
 lm_ncaa = lm(seed_season ~ AdjEM, data = ncaa_full)
 
@@ -188,20 +193,14 @@ summary(lm_ncaa) %>%
   print()
 ```
 
--   From the given summary, we can see that $\beta_0=15.756$, the intercept of the regression line, and $\beta_1=-0.466$, the slope of the regression line
+> From the given summary, we can see that $\beta_0=15.756$, the intercept of the regression line, and $\beta_1=-0.466$, the slope of the regression line. Furthermore, we observe a p-value of $2.2*10^{-16}$, with which we can reject the null hypothesis that there is no association between Adjusted Efficiency Margin and Seeding, at an alpha level of 0.05. This is statistically significant evidence that there indeed is a strong linear association between Adjusted Efficiency Margin and Seeding, as can be observed in the below graph.
 
-```{r}
-ggplot(ncaa_full, aes(x = AdjEM, y = seed_season, color = seeding)) +
-  geom_point() +
-  geom_abline(slope = -0.466, intercept = 15.756)
-```
+3.  Residual Plot
 
 ```{r}
 ncaa_resid = ncaa_full %>%
   mutate()
 ncaa_resid$resid = lm_ncaa$residuals
-
-
 ggplot(ncaa_resid, aes(x=AdjEM, y=resid, color=seed_season)) +
   geom_point() +
   geom_hline(yintercept=0, linetype="dashed", color="black") +
@@ -210,7 +209,20 @@ ggplot(ncaa_resid, aes(x=AdjEM, y=resid, color=seed_season)) +
   ylab("Residuals")
 ```
 
+-   Residual plot shows that our model is underestimating the team's seed on the edges of the plot, while overestimating the middle seeds
 
+    -   Shown by the smooth curve in the residual plot, a quadratic or cubic model would likely work better here than a linear.
+
+3.  Visualizing Regression Line
+
+```{r}
+ggplot(ncaa_full, aes(x = AdjEM, y = seed_season, color = seeding)) +
+  geom_point() +
+  geom_abline(slope = -0.466, intercept = 15.756, color = 'red', linetype='dashed') +
+  xlab("Adjusted Efficiency Margin") +
+  ylab("Seed") +
+  ggtitle("Team's Adjusted Efficiency Margin vs. Seed", subtitle="With Regression Line")
+```
 
 #### Visualizing Average Adjusted EM by Seed to Verify Regression Findings
 
@@ -224,8 +236,9 @@ ncaa_seed_sum = ncaa_full %>%
 ncaa_seed_sum %>%
   print(n = Inf)
 
-ggplot(ncaa_seed_sum, aes(x = factor(seed_season), y = avg_adj_em)) +
+ggplot(ncaa_seed_sum, aes(x = seed_season, y = avg_adj_em)) +
   geom_col(fill = 'slateblue4') +
+  geom_smooth(se = FALSE, color = 'red', method = 'lm') +
   xlab("Seed") +
   ylab("Adjusted Efficiency Margin") +
   ggtitle("Average Adjusted Efficiency Margin by Seed",
@@ -235,6 +248,8 @@ ggplot(ncaa_seed_sum, aes(x = factor(seed_season), y = avg_adj_em)) +
 > Higher seeds, specifically 1-4 seeds, have great efficiency margins ($>20$+), while low seeds (13-16) have significantly low efficiency margins, with the average 16 seed having a negative efficiency margin.
 
 -   Negative efficiency margins mean that the team has, on average, been outscored by their opponents ($AdjDE > AdjOE$)
+
+> Similar to our findings in the regression model, the bar graph above shows a roughly linear relationship between seeding and adjusted efficiency margin, leading us to further believe our previous findings.
 
 ### Top Four Teams (since 2012) in Adjusted Offensive and Adjusted Defensive Efficiency
 
@@ -276,4 +291,4 @@ top4_ade %>%
 >
 > To conclude, higher seeded teams (1-8) tend to make the Final Four more frequently than lower seeded teams in the NCAA March Madness tournament. This is supported by our analysis of efficiency margins, offensive and defensive efficiency, and seeding. Based on our findings, higher seeded teams do perform better in the tournament.
 
-## References 
+## References
