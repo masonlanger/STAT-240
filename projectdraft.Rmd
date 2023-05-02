@@ -8,6 +8,7 @@ date: "2023-04-22"
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 source("../../scripts/viridis.R")
+source("../../scripts/ggprob.R")
 
 ncaa_full = read_csv('../../data/ncaa/ncaa_tournament_full.csv')
 high = read_csv('../../data/ncaa/high_seeds.csv')
@@ -25,7 +26,7 @@ low = read_csv('../../data/ncaa/low_seeds.csv')
 
 ## Introduction
 
-Basketball is an incredibly variable sport. While all sports share a degree of randomness, basketball--specifically college basketball's "March Madness," the single-elimination Division 1 NCAA (National Collegiate Athletics Association) National Tournament--can be truly unpredictable. Displayed by its wild upsets, incredible buzzer beaters, and "Cinderella stories," March Madness provides a unique glimpse into basketball odds and probabilities. As a group, we chose the NCAA D1 Men's National Tournament as both our topic and our sample, as we wanted to see the statistical trends in common with the most successful of the tournament teams over the past decade. Specifically, we wanted to see how a team's statistical ratings before the tournament would affect their success in the tournament field. **As such, we believe that higher-seed teams (1-8) make the Final Four more frequently than lower-seeded (9-16) teams, due to their highly proficient statistical profile, which includes offensive and defensive ratings.**
+Basketball is an incredibly variable sport. While all sports share a degree of randomness, basketball--specifically college basketball's "March Madness," the single-elimination Division 1 NCAA (National Collegiate Athletics Association) National Tournament--can be truly unpredictable. Displayed by its wild upsets, incredible buzzer beaters, and "Cinderella stories," March Madness provides a unique glimpse into basketball odds and probabilities. As a group, we chose the NCAA D1 Men's National Tournament as both our topic and our sample, as we wanted to see the statistical trends in common with the most successful of the tournament teams over the past decade. Specifically, we wanted to see how a team's statistical ratings before the tournament would affect their success in the tournament field. **As such, we believe teams with highly proficient statistical profiles, which include offensive and defensive efficiency, tend to be ranked higher (according to their seed) than their low-seed counterparts.**
 
 ## Background
 
@@ -81,7 +82,7 @@ ggplot(ncaa_full, aes(x = AdjDE, y = AdjOE, color = seed_season), size = 3) +
 
 ```{r}
 ggplot(ncaa_full, aes(x = AdjOE)) +
-  geom_density() +
+  geom_density(fill = 'blue', alpha = 0.5) +
   facet_wrap(vars(seeding)) +
   xlab("Adjusted Offensive Efficiency") +
   ylab("Density") +
@@ -94,7 +95,7 @@ ggplot(ncaa_full, aes(x = AdjOE)) +
 
 ```{r}
 ggplot(ncaa_full, aes(x = AdjDE)) +
-  geom_density() +
+  geom_density(fill = 'red', alpha = 0.5) +
   facet_wrap(vars(seeding)) +
   xlab("Adjusted Defensive Efficiency") +
   ylab("Density") +
@@ -166,6 +167,34 @@ ci_low_de
 ### Regression with Adjusted Efficiency Margin and Seeds
 
 -   Regression with x = AdjEM and y = seed?
+
+```{r}
+ncaa_adj_em = ncaa_full %>%
+  pull(AdjEM)
+
+seeds = ncaa_full %>%
+  pull(seed_season)
+
+r = cor(ncaa_adj_em, seeds)
+r
+```
+
+-   $r=-0.8997$ suggests that the data points are tightly clustered around a negative slope
+
+```{r}
+lm_ncaa = lm(seed_season ~ AdjEM, data = ncaa_full)
+
+summary(lm_ncaa) %>%
+  print()
+```
+
+-   From the given summary, we can see that $\beta_0=15.756$, the intercept of the regression line, and $\beta_1=-0.466$, the slope of the regression line
+
+```{r}
+ggplot(ncaa_full, aes(x = AdjEM, y = seed_season, color = seeding)) +
+  geom_point() +
+  geom_abline(slope = -0.466, intercept = 15.756)
+```
 
 #### Visualizing Average Adjusted EM by Seed to Verify Regression Findings
 
