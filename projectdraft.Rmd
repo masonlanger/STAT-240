@@ -9,7 +9,6 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 source("../../scripts/viridis.R")
 source("../../scripts/ggprob.R")
-
 ncaa_full = read_csv('../../data/ncaa/ncaa_tournament_full.csv')
 high = read_csv('../../data/ncaa/high_seeds.csv')
 low = read_csv('../../data/ncaa/low_seeds.csv')
@@ -113,53 +112,37 @@ ggplot(ncaa_full, aes(x = AdjDE)) +
 ```{r}
 hi_adj_oe = high %>%
   pull(AdjOE)
-
 hi_adj_de = high %>%
   pull(AdjDE)
-
 xbar_hi_oe = mean(hi_adj_oe)
 sigma_hi_oe = sd(hi_adj_oe)
 se_hi_oe = sigma_hi_oe / sqrt(length(hi_adj_oe))
-
 ci_hi_oe = xbar_hi_oe + c(-1, 1)*1.96*se_hi_oe
 ci_hi_oe
-
-
 xbar_hi_de = mean(hi_adj_de)
 sigma_hi_de = sd(hi_adj_de)
 se_hi_de = sigma_hi_de / sqrt(length(hi_adj_de))
-
 ci_hi_de = xbar_hi_de + c(-1, 1)*1.96*se_hi_de
 ci_hi_de
-
 ```
 
-> We are 95% confident that the true mean for a high-seeded team's adjusted offensive efficiency is between 116.73 and 118.02, while the true mean for their adjusted defensive efficiency is between 91.99 and 93.19.
-
--   ...for lower-seeded teams
+> We are 95% confident that the true mean for a high-seeded team's adjusted offensive efficiency is between 116.73 and 118.02, while the true mean for their adjusted defensive efficiency is between 91.99 and 93.19 for lower-seeded teams.
 
 ```{r}
 low_adj_oe = low %>%
   pull(AdjOE)
-
 low_adj_de = low %>%
   pull(AdjDE)
-
-
 xbar_low_oe = mean(low_adj_oe)
 sigma_low_oe = sd(low_adj_oe)
 se_low_oe = sigma_low_oe / sqrt(length(low_adj_oe))
-
 ci_low_oe = xbar_low_oe + c(-1, 1)*1.96*se_low_oe
 ci_low_oe
-
 xbar_low_de = mean(low_adj_de)
 sigma_low_de = sd(low_adj_de)
 se_low_de = sigma_low_de / sqrt(length(low_adj_de))
-
 ci_low_de = xbar_low_de + c(-1, 1)*1.96*se_low_de
 ci_low_de
-
 ```
 
 > We are 95% confident that the true mean for a low-seeded team's adjusted offensive efficiency is between 105.28 and 106.55, while the true mean for their adjusted defensive efficiency is between 102.12 and 103.32.
@@ -171,10 +154,8 @@ ci_low_de
 ```{r}
 ncaa_adj_em = ncaa_full %>%
   pull(AdjEM)
-
 seeds = ncaa_full %>%
   pull(seed_season)
-
 r = cor(ncaa_adj_em, seeds)
 r
 ```
@@ -188,7 +169,6 @@ r
 
 ```{r}
 lm_ncaa = lm(seed_season ~ AdjEM, data = ncaa_full)
-
 summary(lm_ncaa) %>%
   print()
 ```
@@ -213,7 +193,7 @@ ggplot(ncaa_resid, aes(x=AdjEM, y=resid, color=seed_season)) +
 
     -   Shown by the smooth curve in the residual plot, a quadratic or cubic model would likely work better here than a linear.
 
-3.  Visualizing Regression Line
+4.  Visualizing Regression Line
 
 ```{r}
 ggplot(ncaa_full, aes(x = AdjEM, y = seed_season, color = seeding)) +
@@ -232,10 +212,8 @@ ncaa_seed_sum = ncaa_full %>%
   summarize(avg_adj_oe = round(mean(AdjOE), 2),
             avg_adj_de = round(mean(AdjDE), 2),
             avg_adj_em = round(mean(AdjEM), 2))
-
 ncaa_seed_sum %>%
   print(n = Inf)
-
 ggplot(ncaa_seed_sum, aes(x = seed_season, y = avg_adj_em)) +
   geom_col(fill = 'slateblue4') +
   geom_smooth(se = FALSE, color = 'red', method = 'lm') +
@@ -246,7 +224,6 @@ ggplot(ncaa_seed_sum, aes(x = seed_season, y = avg_adj_em)) +
 ```
 
 > Higher seeds, specifically 1-4 seeds, have great efficiency margins ($>20$+), while low seeds (13-16) have significantly low efficiency margins, with the average 16 seed having a negative efficiency margin.
-
 -   Negative efficiency margins mean that the team has, on average, been outscored by their opponents ($AdjDE > AdjOE$)
 
 > Similar to our findings in the regression model, the bar graph above shows a roughly linear relationship between seeding and adjusted efficiency margin, leading us to further believe our previous findings.
@@ -260,7 +237,6 @@ top4_aoe = ncaa_full %>%
   mutate(AdjOE = round(AdjOE, 2)) %>%
   slice_max(order_by = AdjOE, n = 4) %>%
   select(Season, TeamName, AdjOE, seed_season)
-
 top4_aoe %>%
   print.data.frame(digits = 5)
 ```
@@ -274,21 +250,21 @@ top4_ade = ncaa_full %>%
   mutate(AdjDE = round(AdjDE, 2)) %>%
   slice_min(order_by = AdjDE, n = 4) %>%
   select(Season, TeamName, AdjOE, seed_season)
-
 top4_ade %>%
   print.data.frame(digits = 5)
 ```
 
 > The top four highest adjusted defensive efficiencies since 2012 include **2013 Louisville**, **2015 Kentucky**, **2018** and **2015** **Virginia**. The sample features three one seeds, two of which made it the Final Four--Louisville being the 2013 National Champion.
-
 ## Discussion
 
 > To restate our thesis, we believe that higher-seeded teams (1-8) make the Final Four more frequently than lower-seeded (9-16) teams, due to their highly proficient statistical profile, including mainly but not limited to offensive and defensive ratings. As can be seen in our brief data analysis above, out of the all the teams from the past 10 years (not including 2020 due to the pandemic), average efficiency margin is highest with higher seeds and lowest (even negative) with lower seeds. Furthermore, just doing a brief survey of the top 4 teams in regards to their defensive and offensive ratings in the whole data set, they all appear to be be 3 seed or lower, and almost always make it into the Final Four and the Championship game. Finally, teams with a combination of a low defensive efficiency (which is considered good) and a high offensive efficiency are concentrated with seedings of 1-8. All of our graphs provide strong evidence in proving our thesis that higher seeded teams go farther and do better in the NCAA March Madness Tournament.
->
-> Of course, we must consider the short-comings of our data analysis. There are many lower seeded teams who make it far in the tournament and have offensive and defensive efficiency ratings that are not dissimilar to the majority of the higher seeded teams. These "Cinderella" story teams surface every year and are generally unpredictable in how far they will go in the tournament. Furthermore, these teams can create many upsets in the tournament. A prime example is 16 seed Fairleigh Dickinson beating 1 seed Purdue in this year's tournament.Naturally, we must acknowledge that our thesis that higher seeded teams make it farther in the tournament can be violated by these occassional lower seeded teams that make it far in the tournament, but the majority of time, our thesis still stands.
->
+
+> Expanding further on our formal statistical inference tests, we found that we were 95% confident that the true mean for a low-seeded team's adjusted offensive efficiency is between 105.28 and 106.66, while the true mean for their adjusted defensive efficiency is between 102.12 ans 103.32. For higher-seeded teams, we found that the true mean for adjusted offensive efficiency was much higher, and the true mean for adjusted defensive efficiency was much lower, which corroborates our thesis and findings. Furthermore, based on our regression analysis, we found that there is statistically significant evidence of a linear relationship between Adjusted Efficiency Margin and Seeding, which was consistent with our scatter plot. However, we must consider that our residual plot showed a noticeable pattern, which could indicate that there is a more complex relationship between the two variables. However, we do know that they are related and significant in determining a team's success.
+
+> Of course, we must consider the short-comings of our data analysis. There are many lower seeded teams who make it far in the tournament and have offensive and defensive efficiency ratings that are not dissimilar to the majority of the higher seeded teams. These "Cinderella" story teams surface every year and are generally unpredictable in how far they will go in the tournament. Furthermore, these teams can create many upsets in the tournament. A prime example is 16 seed Fairleigh Dickinson beating 1 seed Purdue in this year's tournament. Naturally, we must acknowledge that our thesis that higher seeded teams make it farther in the tournament can be violated by these occassional lower seeded teams that make it far in the tournament, but the majority of time, our thesis still stands.
+
 > In the future, we can consider many other extraneous variables as well. For example, continuing with the example of Fairleigh Dickinson v. Purdue, many argue that Purdue had a very easy schedule coming into the tournament, and that they were a "fraud" one seed, which is why a 16 seed was able to beat them. This in no way diminishes FDU and other lower seeded teams, but this could help us analyze factors leading to other one seed and higher seed teams not making it to the Final Four. Furthermore, we can critique higher seeded teams making it to the Final Four by evaluating the strength of their schedule leading into the Final Four, and if they had an "easy path" or "hard path" to the Final Four. In order to do this, we would have to consider new data about the pre-tournament schedules of these teams' path to the Final Four and whether or not they deserved their seeding. Additional analysis could also include the correlation between the strength of a conference of a team and their performance in the tournament. Furthermore, we can include the data from every tournament that has ever occurred and peform analyses per decade to see the variation of seedings affecting performance. Finally, it is important to recognize the the March Madness Tournament is essentially random in the end, and anything can happen, ranging from many factors such as injuries to off-court troubles.
->
-> To conclude, higher seeded teams (1-8) tend to make the Final Four more frequently than lower seeded teams in the NCAA March Madness tournament. This is supported by our analysis of efficiency margins, offensive and defensive efficiency, and seeding. Based on our findings, higher seeded teams do perform better in the tournament.
+
+> To conclude, higher seeded teams (1-8) tend to make the Final Four more frequently than lower seeded teams in the NCAA March Madness tournament. This is supported by our analysis of efficiency margins, offensive and defensive efficiency, and seeding. Some future steps include identifying key characteristics of lower seeded teams that allow them to go further in the tournament. However, based on our findings, higher seeded teams do perform better in the tournament. 
 
 ## References
